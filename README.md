@@ -20,3 +20,16 @@ This project is an experimental implementation of a **Small Language Model (SLM)
 - Potential About me chat feature on Portfolio Website
   
 
+
+
+## Byte Pair Encoding 
+
+The algorithm underlying BPE breaks down words that aren’t in its predefined
+vocabulary into smaller subword units or even individual characters, enabling it to
+handle out-of-vocabulary words.
+In short, it builds its vocabulary by iteratively merging frequent characters into subwords and frequent subwords into words. For example, BPE starts with adding all individual single characters to its vocabulary (“a,” “b,” etc.). In the next stage, it merges character combinations that frequently occur together into subwords. For example,
+“d” and “e” may be merged into the subword “de,” which is common in many English words
+like "define," "depend," "made," and "hidden." The merges are determined by a frequency cutoff. 
+
+<img src="/img/bpeExample.png" alt="BPE Example" width="400"/>
+
