@@ -36,3 +36,9 @@ like "define," "depend," "made," and "hidden." The merges are determined by a fr
 </div>
 
 
+## Resources 
+
+The resources used for this project are below. 
+
+1. Raschka, Sebastian. Build a Large Language Model. Manning Publications, 2024. 
+
