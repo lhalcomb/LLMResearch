@@ -31,5 +31,8 @@ In short, it builds its vocabulary by iteratively merging frequent characters in
 “d” and “e” may be merged into the subword “de,” which is common in many English words
 like "define," "depend," "made," and "hidden." The merges are determined by a frequency cutoff. 
 
+<div align="center">
 <img src="/img/bpeExample.png" alt="BPE Example" width="400"/>
+</div>
+
 
