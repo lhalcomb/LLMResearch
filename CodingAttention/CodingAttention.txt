@@ -1,0 +1,24 @@
+This contents of this folder include the necessary knowledge in understanding how 
+attention mechanisms can be constructed into Neural Nets, and their use in LLMs.
+
+Note: Transformers are used for more than just LLMs. Creating the proper embeddings 
+for the transformer architecture is extrememly important in training the model. 
+But their use varies amongst multiple different Machine Learning techniques. 
+
+
+We will cover the following: 
+
+    ---     The reasons for using attention mechanisms in
+        neural networks
+    ---     A basic self-attention framework, progressing to
+        an enhanced self-attention mechanism
+    ---     A causal attention module that allows LLMs to
+        generate one token at a time
+    ---     Masking randomly selected attention weights with
+        dropout to reduce overfitting
+    ---     Stacking multiple causal attention modules into a
+        multi-head attention module
+
+
+Summary:
+
