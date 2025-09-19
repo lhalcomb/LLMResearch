@@ -41,4 +41,4 @@ like "define," "depend," "made," and "hidden." The merges are determined by a fr
 The resources used for this project are below. 
 
 1. Raschka, Sebastian. Build a Large Language Model. Manning Publications, 2024. 
-
+2. 'Attention is All You Need', 2017 https://arxiv.org/pdf/1706.03762 

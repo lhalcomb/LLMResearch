@@ -1,27 +1,98 @@
 """
-3.5 Hiding future words with casual attention 
+The following CausalAttention class is similar to the SelfAttention class we implemented
+earlier, except that we added the dropout and causal mask components
 
-For many LLM tasks, you will want the self-attention mechanism to consider only the tokens
-that appear prior to the current position when predicting the next token in a sequence.
-Casual attention, also known as masked attention, is a specialized form of self-attention.
-It restricts a model to only consider previous and current inputs in asequence when processing 
-any given token whenb computing attention scores. This is in contrast to the standard self-attention
-mechanism, which allows access to the entire input sequence at once. 
 
-Now we do a modification of the standard self-attention mechanism to create 
-a casual attention mechanism, which is essential for developing an LLM. To achieve the 
-GPT-like LLM architecure, for each token processed, we need to mask out the future tokens. These
-future tokens come after the current token in the input text. 
 
-We masl out the attention weights above the diagonal and we normalize the nonmasked
-attention weights such that the attention weights can sum to 1 in each row. 
+register_buffer() -- this in PyTorch is not strictly necessary for all use cases but offers several advantages here. 
+                For instance, when we use the CausalAttention class in our LLM, buffers are automatically
+                moved to the appropriate device (CPU or GPU) along with our model, which will
+                be relevant when training our LLM. This means we don't need to manually ensure
+                these tensors are on the same device as your model parameters, avoiding device mismatch
+                errors.
 """
 
+import torch
+import torch.nn as nn
 
-import torch 
+class CausalAttention(nn.Module):
+    def __init__(self, d_in, d_out, context_length, dropout, qkv_bias=False):
+        super().__init__()
+        
+        self.d_out = d_out
+        self.W_query = nn.Linear(d_in, d_out, bias=qkv_bias)
+        self.W_key = nn.Linear(d_in, d_out, bias=qkv_bias)
+        self.W_value = nn.Linear(d_in, d_out, bias=qkv_bias)
+        self.dropout = nn.Dropout(dropout)
+
+        #Compared to the previous SelfAttention_v1 class, we added a dropout layer.
+
+        self.register_buffer( #The register_buffer call is also a new addition (more information is provided in the following text).
+        'mask',
+        torch.triu(torch.ones(context_length, context_length),
+        diagonal=1)
+        )
+
+
+
+    def forward(self, x):
+        b, num_tokens, d_in = x.shape
+        
+        keys = self.W_key(x)
+        queries = self.W_query(x)
+        values = self.W_value(x)
+        
+        attn_scores = queries @ keys.transpose(1, 2)
+        """
+        We transpose
+        dimensions 1 and 2,
+        keeping the batch
+        dimension at the first
+        position (0).
+        """
+
+        attn_scores.masked_fill_( 
+        #In PyTorch, operations with a trailing underscore are performed in-place, avoiding unnecessary memory copies.
+
+        self.mask.bool()[:num_tokens, :num_tokens], -torch.inf)
+        attn_weights = torch.softmax(
+        attn_scores / keys.shape[-1]**0.5, dim=-1
+
+        )
+        
+        attn_weights = self.dropout(attn_weights)
+        context_vec = attn_weights @ values
+
+        return context_vec
+    
+
+
 
 
 
 if __name__ == "__main__":
+    torch.manual_seed(123)
 
-    #Applying a casual attention mask
+    inputs = torch.tensor(
+        [[0.43, 0.15, 0.89], # Your (x^1)
+        [0.55, 0.87, 0.66], # journey (x^2)
+        [0.57, 0.85, 0.64], # starts (x^3)
+        [0.22, 0.58, 0.33], # with (x^4)
+        [0.77, 0.25, 0.10], # one (x^5)
+        [0.05, 0.80, 0.55]] # step (x^6)
+    )
+
+    d_in = inputs.shape[1] # the embedding size. d_in = 3 bc [0.55, 0.87, 0.66], # journey (x^2)
+    d_out = 2 # hardcoded output embedding size. typically equal to input but for illustration purposes we will go with 2
+
+    batch = torch.stack((inputs, inputs), dim=0)
+    
+    context_length = batch.shape[1]
+    ca = CausalAttention(d_in, d_out, context_length, 0.0)
+    context_vecs = ca(batch)
+    print("context_vecs.shape:", context_vecs.shape) #boom! context_vecs.shape: torch.Size([2, 6, 2])
+
+
+    #next we will expand on this concept into a 
+    #multi-head attention module that implements several 
+    #casual attentions in parallel
