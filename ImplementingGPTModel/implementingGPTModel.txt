@@ -1,0 +1,26 @@
+The contents of this folder include the necessary knowledge in a GPT-like 
+llm model from scratch to generate text. 
+
+
+We will cover the following: 
+
+    -- Coding a GPT-like large language model (LLM)
+        that can be trained to generate human-like text
+    -- Normalizing layer activations to stabilize neural
+    network training
+    -- Adding shortcut connections in deep neural
+    networks
+    -- Implementing transformer blocks to create GPT
+    models of various sizes
+    -- Computing the number of parameters and
+    storage requirements of GPT models
+
+
+The following folder contains much information that can be found in research papers across the internet
+Here are the references. 
+
+References: 
+
+   "Language Models Are Unsupervised Multitask Learners,” by Radford et al. (https://mng.bz/yoBq).
+
+Summary: 
