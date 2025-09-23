@@ -1,15 +1,15 @@
 """
-3.5 Hiding future words with casual attention 
+3.5 Hiding future words with causal attention 
 
 For many LLM tasks, you will want the self-attention mechanism to consider only the tokens
 that appear prior to the current position when predicting the next token in a sequence.
-Casual attention, also known as masked attention, is a specialized form of self-attention.
+causal attention, also known as masked attention, is a specialized form of self-attention.
 It restricts a model to only consider previous and current inputs in asequence when processing 
 any given token whenb computing attention scores. This is in contrast to the standard self-attention
 mechanism, which allows access to the entire input sequence at once. 
 
 Now we do a modification of the standard self-attention mechanism to create 
-a casual attention mechanism, which is essential for developing an LLM. To achieve the 
+a causal attention mechanism, which is essential for developing an LLM. To achieve the 
 GPT-like LLM architecure, for each token processed, we need to mask out the future tokens. These
 future tokens come after the current token in the input text. 
 
@@ -24,7 +24,7 @@ from SelfAttention_v2 import SelfAttention_v2
 
 if __name__ == "__main__":
 
-    #Applying a casual attention mask
+    #Applying a causal attention mask
 
     inputs = torch.tensor(
         [[0.43, 0.15, 0.89], # Your (x^1)

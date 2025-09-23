@@ -6,12 +6,16 @@ We will cover the following:
 
     -- Coding a GPT-like large language model (LLM)
         that can be trained to generate human-like text
+
     -- Normalizing layer activations to stabilize neural
     network training
+
     -- Adding shortcut connections in deep neural
     networks
+
     -- Implementing transformer blocks to create GPT
     models of various sizes
+    
     -- Computing the number of parameters and
     storage requirements of GPT models
 

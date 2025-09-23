@@ -18,7 +18,7 @@ context vector matrix Z.
 """
 
 #Lets create a wrapper class to implement multi-head attention
-from CasualAttention import CausalAttention
+from CodingAttention.CausalAttention import CausalAttention
 import torch
 import torch.nn as nn
 
