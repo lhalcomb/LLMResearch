@@ -169,8 +169,116 @@ if __name__ == "__main__":
     #next is looking at the GELU activation function 
 
     """
+    The FeedForward module plays a crucial role in enhancing the model's ability to learn
+    from and generalize the data. Although the input and output dimensions of this
+    module are the same, it internally expands the embedding dimension into a higherdimensional
+    space through the first linear layer.
     
+    This expansion is followed by a nonlinear GELU activation and then a contraction back to the original dimension with the second linear transformation. Such a design allows for the
+    exploration of a richer representation space.
+
+
+    See figure 4.10 on page 108 for better illustration of the linear layers
+    """
+
+    
+    #4.3 Implementing a feed forward network with GELU activations
+
+
+
+    from FeedForward import FeedForward
+    ffn = FeedForward(GPT_CONFIG_124M)
+    out = torch.rand(2, 3, 768)
+    print(out.shape) #prints 2, 3, 768
+
+
+    #4.4 Adding Shortcut Connections 
+    """
+    Understanding the concept of Shortcut Connections: 
+
+        Originally, shortcut connections were proposed for deep networks in
+    computer vision (specifically, in residual networks) to mitigate the challenge of vanishing gradients. The vanishing gradient problem refers to the issue where gradients
+    (which guide weight updates during training) become progressively smaller as they
+    propagate backward through the layers, making it difficult to effectively train earlier
+    layers.
+
+    Shortcut conncetions in an LLM just creates an alternative, shorter path for the 
+    griadent to flow thrugh the network by skipping one or more layers, which is achieved
+    by adding the output of one layer to the output of a later layer. 
+
+    This is why these connections are also known as skip connections. They play a crucial 
+    role in preserving the flow of graidents during the backward pass in training. 
+
+
+    Now we will implement shortcut connections in the feed forward method
+    """
+
+    from FeedForward import ExampleDeepNeuralNetwork
+
+    layer_sizes = [3, 3, 3, 3, 3, 1] # layers are designed to 
+    sample_input = torch.tensor([[1., 0., -1.]]) #accept an example with 3 input values
+    torch.manual_seed(123)
+    model_without_shortcut = ExampleDeepNeuralNetwork( 
+    layer_sizes, use_shortcut=False
+    )
+
+    #here is the function that computes the gradients in the models backward pass
+
+    def print_gradients(model, x):
+        output = model(x) #forward pass
+        target = torch.tensor([[0.]]) 
+        loss = nn.MSELoss()
+        loss = loss(output, target) #calculate loss on how close the target and output are
+        loss.backward() #backward pass to calculate the gradients
+
+        if model.use_shortcut == False: 
+            print("Vanishing Gradients: \n")
+        else: 
+            print("Skip Connections Activated: \n")
+        for name, param in model.named_parameters(): # we can loop through the weights via model.named_paramters()
+            if 'weight' in name:
+                print(f"{name} has gradient mean of {param.grad.abs().mean().item()}")
+
+    print_gradients(model_without_shortcut, sample_input)
+
+    """
+    Recall that the gradient vector  of a loss function indicates the direction of the steepest increase in error 
+    for a given set of model parameters. By moving in the opposite (negative) direction 
+    of this gradient, known as gradient descent, models can iteratively adjust their parameters to minimize the error, 
+    leading to more accurate predictions and better performance. 
+
+    Here that is exactly what we are trying to achieve but with a LLM. 
+
+    Output: 
+        layers.0.0.weight has gradient mean of 0.00020173587836325169
+        layers.1.0.weight has gradient mean of 0.00012011159560643137
+        layers.2.0.weight has gradient mean of 0.0007152039906941354
+        layers.3.0.weight has gradient mean of 0.0013988736318424344
+        layers.4.0.weight has gradient mean of 0.005049645435065031
+
+        From the output above we see that the gradients become smaller
+    as we progress from the last layer (layers.4) to the first layer (layers.0), which is
+    a phenomenon called the vanishing gradient problem.
+
+    """
+
+    #we fix the vanishing gradient problem with the shortcut connection technique 
+    torch.manual_seed(123)
+    model_with_shortcut = ExampleDeepNeuralNetwork(
+    layer_sizes, use_shortcut=True
+    )
+    print_gradients(model_with_shortcut, sample_input)
+
+
+    """
+        In conclusion, shortcut connections are important for overcoming the limitations
+    posed by the vanishing gradient problem in deep neural networks. Shortcut connections are a core building block of very large models such as LLMs, and they will help
+    facilitate more effective training by ensuring consistent gradient flow across layers
+    when we train the GPT model in the next chapter.
+    Next, we'll connect all of the previously covered concepts (layer normalization,
+    GELU activations, feed forward module, and shortcut connections) in a transformer
+    block, which is the final building block we need to code the GPT architecture.
     
     """
 
-    #4.3 Implementing a feed forward network with GELU activations
+    #4.5 Connection attention and linear layers in a transformer block

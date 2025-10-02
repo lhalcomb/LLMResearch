@@ -1,6 +1,8 @@
 The contents of this folder include the necessary knowledge in a GPT-like 
 llm model from scratch to generate text. 
 
+The bulk of this chapter is very dense. Pay close attention, haha attention. 
+I feel like I should cite the paper everytime I say the word. -- Layden H.
 
 We will cover the following: 
 
