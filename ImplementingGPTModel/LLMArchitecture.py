@@ -12,6 +12,12 @@ from DummyGPTModel import DummyGPTModel
 from LayerNorm import LayerNorm
 tokenizer = tiktoken.get_encoding("gpt2")
 
+import sys
+import os
+
+# Add the top-level project directory (/Users/laydenhalcomb/LLMResearch)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "/Users/laydenhalcomb/LLMResearch/LLMResearch")))
+
 GPT_CONFIG_124M = {
     "vocab_size": 50257, # Vocabulary size
     "context_length": 1024, # Context length
@@ -62,15 +68,15 @@ if __name__ == "__main__":
     batch.append(torch.tensor(tokenizer.encode(txt1)))
     batch.append(torch.tensor(tokenizer.encode(txt2)))
     batch = torch.stack(batch, dim=0)
-    print(batch) #prints = (tensor([[6109, 3626, 6100,  345], [6109, 1110, 6622,  257]]))
+    #print(batch) #prints = (tensor([[6109, 3626, 6100,  345], [6109, 1110, 6622,  257]]))
 
 
     #next initialize the 124 million parameter DummyGPTModel
     torch.manual_seed(123)
     model = DummyGPTModel(GPT_CONFIG_124M)
     logits = model(batch)
-    print("Output shape:", logits.shape)
-    print(logits)
+    # print("Output shape:", logits.shape)
+    # print(logits)
 
     #4.2 Normalizing activations with layer normalization
     """
@@ -91,11 +97,11 @@ if __name__ == "__main__":
 
     torch.manual_seed(123)
     batch_example = torch.randn(2, 5)
-    print("Batch Example: ", batch_example)
+    #print("Batch Example: ", batch_example)
     layer = nn.Sequential(nn.Linear(5, 6), nn.ReLU())
-    print("Layers: ", layer)
+    #print("Layers: ", layer)
     out = layer(batch_example)
-    print(out)
+    #print(out)
 
     """This above prints this below 
 
@@ -113,16 +119,16 @@ if __name__ == "__main__":
     """
     mean = out.mean(dim=-1, keepdim=True)
     var = out.var(dim=-1, keepdim=True)
-    print("Mean:\n", mean)
-    print("Variance:\n", var)
+    # print("Mean:\n", mean)
+    # print("Variance:\n", var)
 
     #now we calculate the standard deviation of the output layer
     out_norm = (out - mean) / torch.sqrt(var)
     mean = out_norm.mean(dim=-1, keepdim=True)
     var = out_norm.var(dim=-1, keepdim=True)
-    print("Normalized layer outputs:\n", out_norm)
-    print("Mean:\n", mean)
-    print("Variance:\n", var)
+    #print("Normalized layer outputs:\n", out_norm)
+    # print("Mean:\n", mean)
+    # print("Variance:\n", var)
 
 
     """
@@ -151,8 +157,8 @@ if __name__ == "__main__":
     out_ln = ln(batch_example)
     mean = out_ln.mean(dim = -1, keepdim=True)
     var = out_ln.var(dim=-1, unbiased=False, keepdim=True)
-    print("Mean: \n", mean)
-    print("Variance:\n", var)
+    #print("Mean: \n", mean)
+    #print("Variance:\n", var)
 
     """
     Result is below: 
@@ -189,7 +195,7 @@ if __name__ == "__main__":
     from FeedForward import FeedForward
     ffn = FeedForward(GPT_CONFIG_124M)
     out = torch.rand(2, 3, 768)
-    print(out.shape) #prints 2, 3, 768
+    #print(out.shape) #prints 2, 3, 768
 
 
     #4.4 Adding Shortcut Connections 
@@ -239,7 +245,7 @@ if __name__ == "__main__":
             if 'weight' in name:
                 print(f"{name} has gradient mean of {param.grad.abs().mean().item()}")
 
-    print_gradients(model_without_shortcut, sample_input)
+    #print_gradients(model_without_shortcut, sample_input)
 
     """
     Recall that the gradient vector  of a loss function indicates the direction of the steepest increase in error 
@@ -267,7 +273,7 @@ if __name__ == "__main__":
     model_with_shortcut = ExampleDeepNeuralNetwork(
     layer_sizes, use_shortcut=True
     )
-    print_gradients(model_with_shortcut, sample_input)
+    #print_gradients(model_with_shortcut, sample_input)
 
 
     """
@@ -282,3 +288,108 @@ if __name__ == "__main__":
     """
 
     #4.5 Connection attention and linear layers in a transformer block
+
+    """
+    This is where the fun begins. 
+
+        We now are implementing the transformer block, a fundamental building block of GPT and
+    other LLM architectures. This block, which is repeated a dozen times in the 124-millionparameter GPT-2 architecture, 
+    combines several concepts we have previously covered:
+        multi-head attention, layer normalization, dropout, feed forward layers, and GELU
+        activations. 
+    Later, we will connect this transformer block to the remaining parts of the
+    GPT architecture
+    
+    """
+    from TransformerBlock import TransformerBlock
+
+    torch.manual_seed(123)
+    x = torch.rand(2, 4, 768)
+    block = TransformerBlock(GPT_CONFIG_124M)
+    output = block(x)
+    #print("Input shape:", x.shape)
+    #print("Output shape:", output.shape)
+    """
+    Input shape: torch.Size([2, 4, 768])
+    Output shape: torch.Size([2, 4, 768])
+    """
+
+    #4.6 Coding the GPT Model
+
+    """
+        We are now replacing the DummyTransformerBlock and DummyLayerNorm placeholders
+    with the real TransformerBlock and LayerNorm classes we coded previously to assemble a fully working version of the original 124-million-parameter version of GPT-2. In
+    chapter 5, we will pretrain a GPT-2 model, and in chapter 6, we will load in the pretrained weights from OpenAI
+    """
+    from GPTModel import GPTModel
+
+    torch.manual_seed(123)
+    model = GPTModel(GPT_CONFIG_124M)
+    out = model(batch)
+    print("Input batch:\n", batch)
+    print("\nOutput shape:", out.shape)
+    print(out)
+
+    """
+    Output from above code: 
+
+        tensor([[6109, 3626, 6100,  345],
+            [6109, 1110, 6622,  257]])
+
+    Output shape: torch.Size([2, 4, 50257])
+    tensor([[[ 0.3613,  0.4222, -0.0711,  ...,  0.3483,  0.4661, -0.2838],
+            [-0.1792, -0.5660, -0.9485,  ...,  0.0477,  0.5181, -0.3168],
+            [ 0.7120,  0.0332,  0.1085,  ...,  0.1018, -0.4327, -0.2553],
+            [-1.0076,  0.3418, -0.1190,  ...,  0.7195,  0.4023,  0.0532]],
+
+            [[-0.2564,  0.0900,  0.0335,  ...,  0.2659,  0.4454, -0.6806],
+            [ 0.1230,  0.3653, -0.2074,  ...,  0.7705,  0.2710,  0.2246],
+            [ 1.0558,  1.0318, -0.2800,  ...,  0.6936,  0.3205, -0.3178],
+            [-0.1565,  0.3926,  0.3288,  ...,  1.2630, -0.1858,  0.0388]]],
+        grad_fn=<UnsafeViewBackward0>)
+
+
+        As we can see, the output tensor has the shape [2, 4, 50257], since we passed in two
+    input texts with four tokens each. The last dimension, 50257, corresponds to the
+    vocabulary size of the tokenizer. Later, we will see how to convert each of these 50,257-
+    dimensional output vectors back into tokens.
+    """
+
+    #before we move forward, lets collect the total number of element params
+    total_params = sum(p.numel() for p in model.parameters())
+    print(f"Total number of parameters: {total_params:,}")
+
+
+    total_params_gpt2 = (
+    total_params - sum(p.numel()
+    for p in model.out_head.parameters())
+    )
+
+    print(f"Number of trainable parameters "
+    f"considering weight tying: {total_params_gpt2:,}"
+    )
+
+    """
+        Weight tying reduces the overall memory footprint and computational complexity
+    of the model. However, using separate token embedding and output layers results in better 
+    training and model performance; so we use sepaarate layers in our GPTModel implementation
+    
+    Lastly, for 4.6, let's compute the memory requirements of the 163 million parameters in our
+    GPTModel object
+    """
+
+    total_size_bytes = total_params * 4
+    total_size_mb = total_size_bytes / (1024 * 1024)
+    print(f"Total size of the model: {total_size_mb:.2f} MB")
+
+    #result: Total size of the model: 621.83 MB
+
+    """
+        In conclusion, by calculating the memory requirements for the 163 million parameters in our GPTModel object and assuming each parameter is a 32-bit float taking up 4
+    bytes, we find that the total size of the model amounts to 621.83 MB, illustrating the
+    relatively large storage capacity required to accommodate even relatively small LLMs. 
+    
+    """
+
+    #4.7 Generating Text
+
