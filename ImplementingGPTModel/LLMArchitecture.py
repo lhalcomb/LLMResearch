@@ -393,3 +393,62 @@ if __name__ == "__main__":
 
     #4.7 Generating Text
 
+    #now we are going to implement the code that converts the tensor outputs back into text
+
+    #see pg 122-125 for understanding the process of how an llm generates text a token at a time
+
+    def generate_text_simple(model, idx, max_new_tokens, context_size):
+        """
+        idx is a (batch, n_tokens)
+        array of indices in the
+        current context.
+        """
+        for _ in range(max_new_tokens):
+            idx_cond = idx[:, -context_size:]
+
+            with torch.no_grad():
+                logits = model(idx_cond)
+        """
+        Line: 417 logits = logits[:, -1, :]
+            Focuses only on the last time step,
+        so that (batch, n_token, vocab_size)
+        becomes (batch, vocab_size)
+        """
+        logits = logits[:, -1, :]
+        probas = torch.softmax(logits, dim=-1) #probas has shape (batch, vocab_size).
+        idx_next = torch.argmax(probas, dim=-1, keepdim=True)  #idx_next has shape (batch, 1).
+        idx = torch.cat((idx, idx_next), dim=1) #Appends sampled index to the running sequence, where idx has shape (batch, n_tokens+1)
+
+        return idx
+    
+    start_context = "Hello, My name is"
+    encoded = tokenizer.encode(start_context)
+    print("encoded:", encoded)
+    encoded_tensor = torch.tensor(encoded).unsqueeze(0)
+    print("encoded_tensor.shape:", encoded_tensor.shape)
+
+    #output: encoded: [15496, 11, 2011, 1438, 318], encoded_tensor.shape: torch.Size([1, 5])
+
+
+    model.eval()
+    out = generate_text_simple(
+    model=model,
+    idx=encoded_tensor,
+    max_new_tokens=6,
+    context_size=GPT_CONFIG_124M["context_length"]
+    )
+    print("Output:", out)
+    print("Output length:", len(out[0]))
+
+    #output: 
+    #  Output: tensor([[15496,    11,  2011,  1438,   318, 43423]])
+    #  Output length: 6
+    #
+
+    decoded_text = tokenizer.decode(out.squeeze(0).tolist())
+    print(decoded_text)
+
+    #output: Hello, My name is hauled
+
+    # bunch of gibberish because we haven't trained it off a dataset yet
+    # we will train this in the next chapter! 
