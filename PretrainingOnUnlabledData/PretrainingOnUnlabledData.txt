@@ -1,0 +1,23 @@
+
+Thus far, we have implemented the data sampling and attention mechanism and
+coded the LLM architecture. It is now time to implement a training function and
+pretrain the LLM. We will learn about basic model evaluation techniques to measure the quality of the generated text, which is a requirement for optimizing the
+LLM during the training process. Moreover, we will discuss how to load pretrained
+weights, giving our LLM a solid starting point for fine-tuning. Figure 5.1 lays out
+our overall plan, highlighting what we will discuss in this chapter.
+
+We will cover the following:
+
+    -- Computing the training and validation set losses
+    to assess the quality of LLM-generated text during training
+
+    --  Implementing a training function and pretraining
+    the LLM
+
+    --  Saving and loading model weights to continue
+    training an LLM
+
+    -- Loading pretrained weights from OpenAI
+
+
+Summary:
