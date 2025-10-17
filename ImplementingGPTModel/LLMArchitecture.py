@@ -12,15 +12,10 @@ from DummyGPTModel import DummyGPTModel
 from LayerNorm import LayerNorm
 tokenizer = tiktoken.get_encoding("gpt2")
 
-import sys
-import os
-
-# Add the top-level project directory (/Users/laydenhalcomb/LLMResearch)
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "/Users/laydenhalcomb/LLMResearch/LLMResearch")))
 
 GPT_CONFIG_124M = {
     "vocab_size": 50257, # Vocabulary size
-    "context_length": 1024, # Context length
+    "context_length": 1024, # Context length, use 1024
     "emb_dim": 768, # Embedding dimension
     "n_heads": 12, # Number of attention heads
     "n_layers": 12, # Number of layers
@@ -356,6 +351,22 @@ if __name__ == "__main__":
     """
 
     #before we move forward, lets collect the total number of element params
+    # params = []
+    # for p in model.parameters(): 
+    #     params.append(len(p))
+    
+    # for param in params:
+    #     print(param, end=", ")
+    
+    param_var = [p.numel() for p in model.parameters()]
+    print(param_var)
+    emb_dimAmount = 0
+    for p in param_var:
+        if (p == 768):
+            emb_dimAmount+=1
+    print(emb_dimAmount)
+            
+
     total_params = sum(p.numel() for p in model.parameters())
     print(f"Total number of parameters: {total_params:,}")
 
