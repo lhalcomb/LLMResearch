@@ -1,6 +1,6 @@
 # Learning How LLM's Work
 
-This project is me walking through the **Build a Large Language Model from scratch book. 
+This project is me walking through the **Build a Large Language Model** from scratch book. 
 
 ## Features
 - Tokenization and vocabulary building  
@@ -10,14 +10,9 @@ This project is me walking through the **Build a Large Language Model from scrat
 - Sampling and text generation  
 - Configurable hyperparameters (layers, hidden size, vocab size, etc.)  
 
-## Learning Goals
-
-
 ## Project Goals 
 - CLI Chat UI to inference my GPTModel instance and one from OpenAI or Meta
   
-
-
 
 ## Byte Pair Encoding 
 
