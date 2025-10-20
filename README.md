@@ -1,6 +1,6 @@
-# Small Language Model (SLM)
+# Learning How LLM's Work
 
-This project is me walking through the 8
+This project is me walking through the **Build a Large Language Model from scratch book. 
 
 ## Features
 - Tokenization and vocabulary building  
