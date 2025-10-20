@@ -48,13 +48,13 @@ model.eval()
 #development of the text_to_token_ids and token_ids_to_text from utility file
 from utility import text_to_token_ids, token_ids_to_text, generate_text_simple
 
-start_context = "Every effort moves you"
-token_ids = generate_text_simple(
- model=model,
- idx=text_to_token_ids(start_context, tokenizer),
- max_new_tokens=10,
- context_size=GPT_CONFIG_124M["context_length"]
-)
+# start_context = "Every effort moves you"
+# token_ids = generate_text_simple(
+#  model=model,
+#  idx=text_to_token_ids(start_context, tokenizer),
+#  max_new_tokens=10,
+#  context_size=GPT_CONFIG_124M["context_length"]
+# )
 
 #print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
 
@@ -326,7 +326,7 @@ val_loader = create_dataloader_v1(
 from utility import train_model_simple
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
+# model.to(device)
 
 # with torch.no_grad():
 #  train_loss = calc_loss_loader(train_loader, model, device)
@@ -370,26 +370,26 @@ train_losses, val_losses, tokens_seen = train_model_simple(
 
 
 #Here is a plot of the training and validation set side by side
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
-def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
-    fig, ax1 = plt.subplots(figsize=(5, 3))
-    ax1.plot(epochs_seen, train_losses, label="Training loss")
-    ax1.plot(
-    epochs_seen, val_losses, linestyle="-.", label="Validation loss"
-    )
-    ax1.set_xlabel("Epochs")
-    ax1.set_ylabel("Loss")
-    ax1.legend(loc="upper right")
-    ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
-    ax2 = ax1.twiny() #creates a second x-axis that shares the same y-axis
-    ax2.plot(tokens_seen, train_losses, alpha=0) #invisible plot for aligning ticks
-    ax2.set_xlabel("Tokens seen")
-    fig.tight_layout()
-    plt.show()
+# import matplotlib.pyplot as plt
+# from matplotlib.ticker import MaxNLocator
+# def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
+#     fig, ax1 = plt.subplots(figsize=(5, 3))
+#     ax1.plot(epochs_seen, train_losses, label="Training loss")
+#     ax1.plot(
+#     epochs_seen, val_losses, linestyle="-.", label="Validation loss"
+#     )
+#     ax1.set_xlabel("Epochs")
+#     ax1.set_ylabel("Loss")
+#     ax1.legend(loc="upper right")
+#     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
+#     ax2 = ax1.twiny() #creates a second x-axis that shares the same y-axis
+#     ax2.plot(tokens_seen, train_losses, alpha=0) #invisible plot for aligning ticks
+#     ax2.set_xlabel("Tokens seen")
+#     fig.tight_layout()
+#     plt.show()
 
-epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
-plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+# epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
+# plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
 
 """
 As we can see, both the training and validation losses start to improve for the first epoch. However,
@@ -414,3 +414,30 @@ We have completed four of our objectives for this chapter.
 Next, we will cover text generation strategies for LLMs to reduce training data memorization and increase the originality of the LLM-generated text before we cover weight
 loading and saving and loading pretrained weights from OpenAI's GPT model.
 """
+
+"""
+
+See RandomnessControl.py
+
+
+We can now apply the temperature scaling and multinomial function for probabilistic
+sampling to select the next token among these three non-zero probability scores to
+generate the next token. We do this next by modifying the text generation function.
+"""
+
+#5.3.3 Modifying the text generation function
+
+#let's combine these two to create a new generate function --- see utility.py
+from utility import generate
+
+
+torch.manual_seed(123)
+token_ids = generate(
+ model=model,
+ idx=text_to_token_ids("Every effort moves you", tokenizer),
+ max_new_tokens=15,
+ context_size=GPT_CONFIG_124M["context_length"],
+ top_k=25,
+ temperature=1.4
+)
+print("Output text:\n", token_ids_to_text(token_ids, tokenizer)) # Every effort moves youlit terrace.
