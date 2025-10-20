@@ -1,6 +1,6 @@
 # Small Language Model (SLM)
 
-This project is an experimental implementation of a **Small Language Model (SLM)** built from scratch. The goal is to learn and demonstrate the core concepts behind training and running large language models—on a smaller scale that is easier to understand, train, and run on consumer hardware.  
+This project is me walking through the 8
 
 ## Features
 - Tokenization and vocabulary building  
@@ -11,13 +11,10 @@ This project is an experimental implementation of a **Small Language Model (SLM)
 - Configurable hyperparameters (layers, hidden size, vocab size, etc.)  
 
 ## Learning Goals
-- Understand how tokenization and embeddings work  
-- Implement attention and transformer blocks from scratch  
-- Train a small but functional autoregressive model  
-- Explore scaling laws and limitations of small models  
+
 
 ## Project Goals 
-- Potential About me chat feature on Portfolio Website
+- CLI Chat UI to inference my GPTModel instance and one from OpenAI or Meta
   
 
 
