@@ -268,9 +268,9 @@ torch.manual_seed(123)
 token_ids = generate(
  model=gpt,
  idx=text_to_token_ids(new_prompt, tokenizer).to(device),
- max_new_tokens=25,
+ max_new_tokens=100,
  context_size=NEW_CONFIG["context_length"],
  top_k=50,
- temperature=1.5
+ temperature=0.0
 )
 print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
